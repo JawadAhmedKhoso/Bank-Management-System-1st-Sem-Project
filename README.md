@@ -1,1 +1,1 @@
-# Bank-Management-System-1st-Sem-Project
+# Bank Management System 1st Semester Project
