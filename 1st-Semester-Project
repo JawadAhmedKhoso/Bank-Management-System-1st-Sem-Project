@@ -1,0 +1,219 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+
+string accountnumber;
+string name;
+string password;
+double balance = 0;
+bool accountcreated = false;
+
+const string filename = "account.txt";
+
+
+void loadAccount() {
+    ifstream fin(filename);
+    if (fin) {
+        getline(fin, accountnumber);
+        getline(fin, name);
+        fin >> balance;
+        fin.ignore();
+        getline(fin, password);
+        accountcreated = true;
+    }
+    fin.close();
+}
+
+
+void saveAccount() {
+    ofstream fout(filename);
+    fout << accountnumber << endl;
+    fout << name << endl;
+    fout << balance << endl;
+    fout << password << endl;
+    fout.close();
+}
+
+
+bool verifyPassword() {
+    string input;
+    cout << "                                           Enter your password: ";
+    cin >> input;
+
+    if (input == password) {
+        return true;
+    } else {
+        cout << "                                       Wrong password! Access denied.\n";
+        return false;
+    }
+}
+
+
+void accountcreate() {
+    if (accountcreated) {
+        cout << "                                          Account already exists.\n";
+        return;
+    }
+
+    cout << "                                           Enter account number: ";
+    cin.ignore();
+    getline(cin, accountnumber);
+
+    cout << "                                           Enter account name: ";
+    getline(cin, name);
+
+    if (name[0] >= '0' && name[0] <= '9') {
+        cout << "                                   Invalid name! Do not start name with a number.\n";
+        return;
+    }
+
+    cout << "                                           Enter starting balance: ";
+    cin >> balance;
+    if (balance < 0) {
+        cout << "                                          Invalid amount! Enter valid amount\n";
+        return;
+    }
+
+    cout << "                                        Set a password for your account: ";
+    cin >> password;
+
+    accountcreated = true;
+    saveAccount();
+    cout << "                                          Congrats! Account created successfully.\n";
+}
+
+
+void deposit() {
+    if (!accountcreated) {
+        cout << "                                          Account not found! Create account first.\n";
+        return;
+    }
+
+    if (!verifyPassword()) return;
+
+    double amount;
+    cout << "                                           Enter amount to deposit: ";
+    cin >> amount;
+
+    if (amount <= 0) {
+        cout << "                                        Invalid amount! Enter valid amount to deposit\n";
+        return;
+    }
+
+    balance += amount;
+    saveAccount();
+    cout << "                                        Deposit successful. Your new balance is: " << balance << endl;
+}
+
+
+void withdraw() {
+    if (!accountcreated) {
+        cout << "                                        Account not found! Create account first.\n";
+        return;
+    }
+
+    if (!verifyPassword()) return;
+
+    double amount;
+    cout << "                                       Enter amount to withdraw: ";
+    cin >> amount;
+
+    if (amount <= 0) {
+        cout << "                                     Invalid amount! Enter valid amount to withdraw.\n";
+        return;
+    }
+
+    if (amount > balance) {
+        cout << "                                    Not enough balance!\n";
+        return;
+    }
+
+    balance -= amount;
+    saveAccount();
+    cout << "                                     Withdrawal successful. Your new balance is: " << balance << endl;
+}
+
+
+void checkbalance() {
+    if (!accountcreated) {
+        cout << "                                       Account not found! Create account first.\n";
+        return;
+    }
+
+    if (!verifyPassword()) return;
+
+    cout << "                                ********* Account Balance ***********" << endl;
+    cout << "                                      Your account balance: " << balance << endl;
+}
+
+
+void changepassword() {
+    if (!accountcreated) {
+        cout << "                                       Account not found! Create account first.\n";
+        return;
+    }
+
+    if (!verifyPassword()) return;
+
+    string changepass;
+    cout << "                                   Enter new password: ";
+    cin >> changepass;
+    password = changepass;
+    saveAccount();
+    cout << "                                   Password changed successfully.\n";
+}
+
+
+void accountdetail() {
+    if (!accountcreated) {
+        cout << "                                   Account not found! Create account first.\n";
+        return;
+    }
+
+    if (!verifyPassword()) return;
+
+    cout << "                              Account Number: " << accountnumber << endl;
+    cout << "                              Account Name: " << name << endl;
+    cout << "                              Account Balance: " << balance << endl;
+    cout << "                              Account Password: " << password << endl;
+}
+
+
+void exitBank() {
+    cout << "                                 Have a Nice day! Thanks for using our service\n";
+}
+
+int main() {
+    loadAccount(); 
+
+    int choice;
+    do {
+        cout << endl;
+        cout << "                         ******************* BANK MANAGEMENT SYSTEM ********************" << endl;
+        cout << "                        *                   1. Create Account                         *" << endl;
+        cout << "                        *                   2. Deposit                                *" << endl;
+        cout << "                        *                   3. Withdrawal                             *" << endl;
+        cout << "                        *                   4. Check Balance                          *" << endl;
+        cout << "                        *                   5. Account Details                        *" << endl;
+        cout << "                        *                   6. Change password                        *" << endl;
+        cout << "                        *                   7. Exit                                   *" << endl;
+        cout << "                        **************************************************************" << endl;
+        cout << "                                             Press the above option: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1: accountcreate(); break;
+        case 2: deposit(); break;
+        case 3: withdraw(); break;
+        case 4: checkbalance(); break;
+        case 5: accountdetail(); break;
+        case 6: changepassword(); break;
+        case 7: exitBank(); break;
+        default: cout << "                                       Invalid option! Try again.\n";
+        }
+    } while (choice != 7);
+
+    return 0;
+}
+
